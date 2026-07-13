@@ -1,675 +1,2015 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Himanshu Dulhe | GenAI Engineer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --teal: #00f5d4;
-            --violet: #a855f7;
-            --dark: #000000;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Himanshu Dulhe — Generative AI Engineer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/instrument-serif@latest/latin-400-normal.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/instrument-serif@latest/latin-400-italic.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/satoshi@latest/latin-400-normal.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/satoshi@latest/latin-500-normal.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/satoshi@latest/latin-700-normal.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/satoshi@latest/latin-900-normal.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-500-normal.css" />
+<style>
+  :root {
+    --cream: #f0ead8;
+    --cream-2: #e6dec6;
+    --cream-3: #d9cfb3;
+    --ink: #0f0d0a;
+    --ink-2: #1a1714;
+    --ink-soft: #3d382e;
+    --terra: #e8552e;
+    --teal: #2a9d8f;
+    --sage: #6b8e5e;
+    --ochre: #d4963d;
+    --violet: #7a5af0;
+  }
+  * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+  body {
+    font-family: 'Satoshi', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    overflow-x: hidden;
+    cursor: none;
+  }
+  @media (max-width: 768px) {
+    body { cursor: auto; }
+    .cursor-dot, .cursor-ring { display: none !important; }
+  }
+  .font-serif { font-family: 'Instrument Serif', serif; font-weight: 400; }
+  .italic-serif { font-family: 'Instrument Serif', serif; font-style: italic; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-        body {
-            background-color: var(--dark);
-            color: #f1f5f9;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            overflow-x: hidden;
-        }
+  /* Custom Cursor */
+  .cursor-dot {
+    position: fixed;
+    width: 6px; height: 6px;
+    background: var(--terra);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.25s, height 0.25s, background 0.25s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 38px; height: 38px;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, background 0.3s;
+    mix-blend-mode: difference;
+  }
+  .cursor-hover .cursor-dot { width: 0; height: 0; }
+  .cursor-hover .cursor-ring {
+    width: 60px; height: 60px;
+    background: rgba(232, 85, 46, 0.15);
+    border-color: var(--terra);
+  }
 
-        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    z-index: 100;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 
-        .glass {
-            background: rgba(15, 15, 15, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  .grid-pattern {
+    background-image:
+      linear-gradient(to right, rgba(15,13,10,0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15,13,10,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
 
-        .tilt-card {
-            transform-style: preserve-3d;
-            perspective: 1000px;
-            transition: transform 0.2s ease-out, border-color 0.3s ease;
-            will-change: transform;
-        }
+  .scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px; width: 100%;
+    background: linear-gradient(90deg, var(--terra), var(--ochre), var(--teal));
+    z-index: 200;
+    transform-origin: left;
+    transform: scaleX(0);
+  }
 
-        .tilt-card:hover {
-            border-color: var(--teal);
-            box-shadow: 0 20px 60px rgba(0, 245, 212, 0.15);
-        }
-        
-        .tilt-card.violet-hover:hover {
-            border-color: var(--violet);
-            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.15);
-        }
+  .card {
+    background: var(--cream-2);
+    border: 1px solid rgba(15,13,10,0.08);
+    border-radius: 22px;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease, border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(232,85,46,0.04) 100%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+  .card:hover::before { opacity: 1; }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 60px -20px rgba(15,13,10,0.2);
+    border-color: rgba(15,13,10,0.15);
+  }
 
-        .tilt-content {
-            transform: translateZ(40px);
-        }
+  .card-tilt { transform-style: preserve-3d; will-change: transform; }
+  .card-tilt-inner { transform: translateZ(30px); }
 
-        .neon-text {
-            background: linear-gradient(to bottom, #fff 40%, var(--violet) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.3));
-        }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    text-transform: uppercase;
+    border: 1px solid rgba(15,13,10,0.12);
+    background: var(--cream);
+    transition: all 0.3s;
+  }
+  .tag:hover { transform: translateY(-1px); border-color: var(--terra); }
 
-        .btn-teal {
-            background: var(--teal);
-            color: #000;
-            box-shadow: 0 0 20px rgba(0, 245, 212, 0.3);
-            transition: all 0.3s ease;
-        }
-        .btn-teal:hover { transform: scale(1.05); box-shadow: 0 0 35px var(--teal); }
+  .marquee { display: flex; gap: 3rem; animation: marquee 35s linear infinite; white-space: nowrap; }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 
-        #three-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            pointer-events: none;
-        }
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
 
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
-        }
+  .pulse-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 0 0 rgba(74,222,128,0.6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(74,222,128,0.6); }
+    70% { box-shadow: 0 0 0 12px rgba(74,222,128,0); }
+    100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+  }
 
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+  .hero-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(3.5rem, 13vw, 12rem);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+  }
 
-        input, textarea {
-            background: rgba(255, 255, 255, 0.03) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
-        }
-        input:focus, textarea:focus {
-            border-color: var(--teal) !important;
-            outline: none;
-        }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before {
+    content: '';
+    width: 32px; height: 1px;
+    background: currentColor;
+  }
 
-        /* Gradient Text Logo */
-        .hd-logo {
-            font-weight: 800;
-            font-size: 28px;
-            letter-spacing: -2px;
-            background: linear-gradient(135deg, var(--teal) 0%, #fff 50%, var(--violet) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.2));
-            text-decoration: none;
-            display: inline-block;
-        }
-    </style>
+  .link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: gap 0.3s ease, color 0.3s;
+  }
+  .link-arrow:hover { gap: 14px; }
+  .link-arrow svg { transition: transform 0.3s; }
+  .link-arrow:hover svg { transform: translate(2px, -2px); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 28px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--cream);
+    box-shadow: 0 10px 30px -10px rgba(15,13,10,0.4);
+  }
+  .btn-primary:hover {
+    background: var(--terra);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px -10px rgba(232,85,46,0.5);
+  }
+  .btn-ghost { border: 1px solid var(--ink); color: var(--ink); background: transparent; }
+  .btn-ghost:hover { background: var(--ink); color: var(--cream); }
+
+  .magnetic { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+  .skill-bar {
+    height: 3px;
+    background: rgba(15,13,10,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .skill-bar > div {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ink), var(--terra));
+    border-radius: 2px;
+    transform-origin: left;
+    animation: grow 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    transform: scaleX(0);
+  }
+  @keyframes grow { to { transform: scaleX(1); } }
+
+  .nav-link {
+    position: relative;
+    padding: 6px 0;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 1px;
+    background: var(--terra);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .nav-link:hover { color: var(--terra); }
+  .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  .timeline-item { position: relative; }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 10px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--cream);
+    border: 2px solid var(--terra);
+    box-shadow: 0 0 0 4px var(--cream-2);
+  }
+  .timeline-item::after {
+    content: '';
+    position: absolute;
+    left: -23px;
+    top: 28px;
+    bottom: -32px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--terra), rgba(15,13,10,0.1));
+  }
+  .timeline-item:last-child::after { display: none; }
+
+  .project-card { overflow: hidden; }
+  .project-card .cover { transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .project-card:hover .cover { transform: scale(1.08); }
+  .project-card .cover-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(15,13,10,0.7), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .project-card:hover .cover-overlay { opacity: 1; }
+
+  .ticker { overflow: hidden; }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: blobMove 20s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes blobMove {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 30px) scale(0.95); }
+  }
+
+  .typing-cursor::after {
+    content: '|';
+    animation: blink 1s step-end infinite;
+    color: var(--terra);
+    font-weight: 300;
+  }
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  .stat-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .rotating-badge { animation: rotate 20s linear infinite; }
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .underline-grow { position: relative; display: inline-block; }
+  .underline-grow::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 2px;
+    background: var(--terra);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .underline-grow:hover::after { transform: scaleX(1); }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--ink); border-radius: 4px; }
+
+  .float-slow { animation: floatSlow 6s ease-in-out infinite; }
+  .float-slower { animation: floatSlow 9s ease-in-out infinite; }
+  @keyframes floatSlow {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(3deg); }
+  }
+
+  .morph-shape {
+    position: absolute;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    background: linear-gradient(135deg, var(--terra), var(--ochre));
+    opacity: 0.1;
+    animation: morph 15s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes morph {
+    0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: rotate(0deg); }
+    50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; transform: rotate(180deg); }
+  }
+
+  .noise-overlay { position: relative; }
+  .noise-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    border-radius: inherit;
+  }
+
+  .bg-ink-section { background: var(--ink); color: var(--cream); }
+  .bg-cream-dark { background: var(--cream-2); }
+
+  /* ===== SKILL MATRIX (New) ===== */
+  .tool-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--cream);
+    border: 1px solid rgba(15,13,10,0.1);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+  .tool-chip:hover {
+    border-color: var(--terra);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -8px rgba(15,13,10,0.15);
+  }
+  .tool-chip .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+
+  .proficiency-dots {
+    display: inline-flex;
+    gap: 3px;
+  }
+  .proficiency-dots span {
+    width: 10px; height: 4px;
+    border-radius: 2px;
+    background: rgba(15,13,10,0.12);
+  }
+  .proficiency-dots span.filled { background: var(--ink); }
+  .proficiency-dots span.accent { background: var(--terra); }
+
+  .arsenal-card {
+    position: relative;
+    padding: 2rem;
+    border-radius: 22px;
+    background: var(--cream-2);
+    border: 1px solid rgba(15,13,10,0.08);
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    overflow: hidden;
+  }
+  .arsenal-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 60px -20px rgba(15,13,10,0.2);
+  }
+  .arsenal-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(232,85,46,0.08) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .arsenal-card:hover::before { opacity: 1; }
+
+  .arsenal-number {
+    font-family: 'Instrument Serif', serif;
+    font-size: 140px;
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(15,13,10,0.12);
+    position: absolute;
+    top: 10px; right: 20px;
+    user-select: none;
+  }
+  .arsenal-card:hover .arsenal-number {
+    -webkit-text-stroke: 1.5px var(--terra);
+  }
+
+  .stack-ring {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .stack-ring .center {
+    position: absolute;
+    inset: 30%;
+    background: var(--ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cream);
+    text-align: center;
+    box-shadow: 0 20px 60px -20px rgba(15,13,10,0.4);
+  }
+  .stack-ring .ring {
+    position: absolute;
+    inset: 0;
+    border: 1px dashed rgba(15,13,10,0.15);
+    border-radius: 50%;
+    animation: rotate 60s linear infinite;
+  }
+  .stack-ring .ring-2 {
+    position: absolute;
+    inset: 12%;
+    border: 1px dashed rgba(15,13,10,0.1);
+    border-radius: 50%;
+    animation: rotate 40s linear infinite reverse;
+  }
+  .stack-orbit-item {
+    position: absolute;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--cream-2);
+    border: 1px solid rgba(15,13,10,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 8px 20px -8px rgba(15,13,10,0.15);
+    transition: all 0.3s;
+  }
+  .stack-orbit-item:hover {
+    transform: scale(1.15);
+    background: var(--terra);
+    color: var(--cream);
+    border-color: var(--terra);
+    z-index: 10;
+  }
+
+  /* ===== CERTIFICATION BADGES ===== */
+  .cert-card {
+    background: var(--cream);
+    border: 1px solid rgba(15,13,10,0.1);
+    border-radius: 18px;
+    padding: 1.25rem;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .cert-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -15px rgba(15,13,10,0.15);
+    border-color: var(--terra);
+  }
+  .cert-card .ribbon {
+    position: absolute;
+    top: 12px; right: -30px;
+    background: var(--terra);
+    color: var(--cream);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 3px 30px;
+    transform: rotate(45deg);
+    letter-spacing: 0.1em;
+  }
+
+  /* ===== CONTACT CARDS ===== */
+  .contact-card {
+    background: var(--cream-2);
+    border: 1px solid rgba(15,13,10,0.1);
+    border-radius: 24px;
+    padding: 2rem;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .contact-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 30px 60px -20px rgba(15,13,10,0.25);
+    border-color: var(--terra);
+  }
+  .contact-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--terra), var(--ochre));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .contact-card:hover::before { transform: scaleX(1); }
+  .contact-card .big-icon {
+    width: 64px; height: 64px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s;
+  }
+  .contact-card:hover .big-icon {
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid rgba(15,13,10,0.15);
+    color: var(--ink-soft);
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .copy-btn:hover {
+    background: var(--ink);
+    color: var(--cream);
+    border-color: var(--ink);
+  }
+  .copy-btn.copied {
+    background: var(--sage);
+    color: var(--cream);
+    border-color: var(--sage);
+  }
+
+  /* Journey metrics */
+  .metric-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--cream);
+    border: 1px solid rgba(15,13,10,0.1);
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .metric-pill .big { font-family: 'Instrument Serif', serif; font-size: 18px; font-style: italic; color: var(--terra); }
+
+  /* Issuer color pills */
+  .issuer-aws { background: linear-gradient(135deg, #ff9900, #ffb84d); }
+  .issuer-oracle { background: linear-gradient(135deg, #c74634, #e86a58); }
+  .issuer-google { background: linear-gradient(135deg, #4285f4, #6fa8ff); }
+  .issuer-hacker { background: linear-gradient(135deg, #2ec866, #5ae08a); }
+
+  /* Section header with number */
+  .section-number {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(5rem, 10vw, 9rem);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(15,13,10,0.15);
+  }
+</style>
 </head>
 <body>
 
-    <canvas id="three-canvas"></canvas>
+<div class="grain"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 glass py-5 px-8 border-b border-white/5">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="#" class="hd-logo">
-                HD
-            </a>
-            
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex space-x-10 text-[11px] uppercase tracking-[0.3em] font-bold opacity-60">
-                <a href="#about" class="hover:text-[var(--teal)] hover:opacity-100 transition">About</a>
-                <a href="#skills" class="hover:text-[var(--teal)] hover:opacity-100 transition">Arsenal</a>
-                <a href="#projects" class="hover:text-[var(--violet)] hover:opacity-100 transition">Systems</a>
-                <a href="#journey" class="hover:text-[var(--teal)] hover:opacity-100 transition">Journey</a>
-                <a href="#contact" class="hover:text-[var(--violet)] hover:opacity-100 transition">Contact</a>
-            </div>
-
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-btn" class="md:hidden text-white opacity-80 hover:opacity-100 transition">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
+<!-- NAV -->
+<nav class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-cream/60 border-b border-ink/5">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
+    <a href="#top" class="magnetic flex items-center gap-3">
+      <div class="relative w-10 h-10">
+        <div class="absolute inset-0 rounded-full bg-ink flex items-center justify-center">
+          <span class="text-cream font-serif text-lg">H</span>
         </div>
-    </nav>
+        <div class="absolute inset-0 rounded-full border border-ink/20 rotating-badge">
+          <svg class="absolute -top-1 left-1/2 -translate-x-1/2" width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="2" fill="var(--terra)"/></svg>
+        </div>
+      </div>
+      <div class="hidden sm:block">
+        <div class="font-mono text-[10px] tracking-widest text-ink-soft">PORTFOLIO</div>
+        <div class="text-sm font-bold">himanshu.dulhe</div>
+      </div>
+    </a>
+    <div class="hidden md:flex items-center gap-8 text-sm">
+      <a href="#about" class="nav-link">About</a>
+      <a href="#skills" class="nav-link">Arsenal</a>
+      <a href="#projects" class="nav-link">Systems</a>
+      <a href="#journey" class="nav-link">Journey</a>
+      <a href="#contact" class="btn btn-primary magnetic">Let's build →</a>
+    </div>
+    <button id="mobileMenuBtn" class="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5">
+      <span class="block w-6 h-px bg-ink"></span>
+      <span class="block w-4 h-px bg-ink ml-auto"></span>
+      <span class="block w-6 h-px bg-ink"></span>
+    </button>
+  </div>
+</nav>
 
-    <!-- Mobile Fullscreen Menu -->
-    <div id="mobile-menu" class="fixed inset-0 z-[60] bg-black/95 backdrop-blur-2xl transform translate-x-full transition-transform duration-500 md:hidden flex flex-col items-center justify-center space-y-10">
-        <button id="close-menu-btn" class="absolute top-6 right-8 text-white/50 hover:text-[var(--teal)] transition">
-            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-        <a href="#about" class="text-3xl font-black uppercase tracking-[0.2em] hover:text-[var(--teal)] transition mobile-link">About</a>
-        <a href="#skills" class="text-3xl font-black uppercase tracking-[0.2em] hover:text-[var(--teal)] transition mobile-link">Arsenal</a>
-        <a href="#projects" class="text-3xl font-black uppercase tracking-[0.2em] hover:text-[var(--violet)] transition mobile-link">Systems</a>
-        <a href="#journey" class="text-3xl font-black uppercase tracking-[0.2em] hover:text-[var(--teal)] transition mobile-link">Journey</a>
-        <a href="#contact" class="text-3xl font-black uppercase tracking-[0.2em] hover:text-[var(--violet)] transition mobile-link">Contact</a>
+<!-- MOBILE MENU -->
+<div id="mobileMenu" class="fixed inset-0 z-50 bg-cream translate-x-full transition-transform duration-500 md:hidden flex flex-col items-center justify-center gap-8">
+  <button id="mobileMenuClose" class="absolute top-6 right-6 w-10 h-10">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <a href="#about" class="text-3xl font-serif mobile-link">About</a>
+  <a href="#skills" class="text-3xl font-serif mobile-link">Arsenal</a>
+  <a href="#projects" class="text-3xl font-serif mobile-link">Systems</a>
+  <a href="#journey" class="text-3xl font-serif mobile-link">Journey</a>
+  <a href="#contact" class="text-3xl font-serif italic-serif mobile-link">Contact</a>
+</div>
+
+<!-- HERO -->
+<section id="top" class="relative min-h-screen pt-32 pb-20 px-6 lg:px-10 grid-pattern overflow-hidden">
+  <div class="blob" style="top:10%; left:-10%; width:400px; height:400px; background:var(--terra);"></div>
+  <div class="blob" style="bottom:10%; right:-10%; width:500px; height:500px; background:var(--teal); animation-delay:-7s;"></div>
+  <div class="morph-shape" style="top:20%; right:10%; width:300px; height:300px;"></div>
+
+  <div class="max-w-7xl mx-auto relative z-10">
+    <div class="flex flex-wrap items-center gap-3 mb-8 reveal">
+      <span class="pulse-dot"></span>
+      <span class="font-mono text-[11px] tracking-widest text-ink-soft">OPEN TO WORK · GENAI ENGINEER · Q3 2026</span>
+      <span class="hidden sm:inline-block h-px w-12 bg-ink/20"></span>
+      <span class="font-mono text-[11px] tracking-widest text-ink-soft">GREATER NOIDA · IN</span>
     </div>
 
-    <!-- Hero Section -->
-    <section id="about" class="min-h-screen flex flex-col items-center justify-center px-6 text-center pt-24">
-        <div class="max-w-5xl">
-            <h2 class="text-[var(--teal)] uppercase tracking-[0.7em] text-base md:text-lg mb-8 font-extrabold reveal">GENERATIVE AI ENGINEER</h2>
-            <h1 class="text-4xl md:text-6xl font-bold mb-10 neon-text leading-tight tracking-tighter reveal">Hi, I'm Himanshu</h1>
-            <p class="text-lg md:text-xl text-slate-400 mb-12 max-w-3xl mx-auto font-medium leading-relaxed reveal">
-                Innovative Generative AI Engineer with a strong foundation in designing autonomous agentic workflows and scalable RAG pipelines. Passionate about pushing the boundaries of AI by fine-tuning large language models and architecting robust, high-performance backend systems. Dedicated to transforming complex challenges into intelligent, real-world solutions that drive impact.
-            </p>
-            <div class="flex flex-wrap items-center justify-center gap-5 reveal">
-                <button onclick="document.getElementById('contact').scrollIntoView()" class="btn-teal px-10 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest">Hire Me →</button>
-                <a href="https://github.com/Officialhimanshu710" target="_blank" class="glass border-[var(--violet)]/40 px-10 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:border-[var(--violet)] text-[var(--violet)] transition">GitHub</a>
-                <a href="https://drive.google.com/file/d/1_MybbD_sdefyRlESaFW27d6pEQNtSxgu/view?usp=drive_link" target="_blank" class="glass px-10 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition">Resume</a>
-            </div>
+    <h1 class="hero-name reveal">
+      <span class="block">Himanshu</span>
+      <span class="italic-serif text-terra block">Dulhe<span class="text-ink">.</span></span>
+    </h1>
+
+    <div class="mt-8 mb-12 max-w-2xl reveal" style="transition-delay:0.1s">
+      <div class="font-mono text-sm md:text-base text-ink-soft">
+        <span class="text-terra">$</span> <span class="text-ink-soft">whoami</span>
+        <br>
+        <span class="text-ink" id="typingText"></span><span class="typing-cursor"></span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
+      <div class="lg:col-span-5 card card-tilt p-8 noise-overlay reveal" data-tilt>
+        <div class="card-tilt-inner">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-2 h-2 rounded-full bg-terra"></span>
+            <span class="font-mono text-[10px] tracking-widest text-ink-soft">01 — MANIFESTO</span>
+          </div>
+          <p class="font-serif text-2xl md:text-3xl leading-[1.25] text-ink">
+            I build <span class="italic-serif text-terra">intelligent AI systems</span> where LLMs become first-class citizens — not toys, not wrappers.
+          </p>
+          <p class="mt-6 text-sm leading-relaxed text-ink-soft">
+            B.Tech CSE '26 · Generative AI Engineer crafting production-ready RAG pipelines, fine-tuned open-source models, and autonomous agentic workflows. I treat code like the gym — consistency is key.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-2">
+            <span class="tag bg-ink text-cream border-transparent">LangGraph</span>
+            <span class="tag">RAG</span>
+            <span class="tag bg-terra text-cream border-transparent">QLoRA</span>
+            <span class="tag">FastAPI</span>
+            <span class="tag">n8n</span>
+            <span class="tag">ChromaDB</span>
+          </div>
         </div>
-    </section>
+      </div>
 
-    <!-- Technical Arsenal -->
-    <section id="skills" class="py-32 px-6">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-center text-4xl font-bold mb-20 uppercase tracking-[0.4em] opacity-30 reveal">Technical Arsenal</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                
-                <!-- GenAI & LLMs -->
-                <div class="glass p-8 rounded-[2rem] tilt-card reveal">
-                    <div class="tilt-content">
-                        <div class="w-10 h-10 mb-6 rounded-xl bg-[var(--violet)]/10 flex items-center justify-center text-[var(--violet)]">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                        <h3 class="text-[var(--violet)] text-xs font-black uppercase mb-4 tracking-widest">GenAI & LLMs</h3>
-                        <div class="space-y-2 font-bold text-sm text-slate-300">
-                            <p>RAG Pipelines</p>
-                            <p>LangChain & LangGraph</p>
-                            <p>Prompt Engineering</p>
-                            <p>QLoRA & PEFT</p>
-                            <p>OpenAI / Groq / Gemini APIs</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Retrieval & ML -->
-                <div class="glass p-8 rounded-[2rem] tilt-card reveal" style="transition-delay: 0.1s">
-                    <div class="tilt-content">
-                        <div class="w-10 h-10 mb-6 rounded-xl bg-[var(--teal)]/10 flex items-center justify-center text-[var(--teal)]">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        </div>
-                        <h3 class="text-[var(--teal)] text-xs font-black uppercase mb-4 tracking-widest">Evaluation & Retrieval</h3>
-                        <div class="space-y-2 font-bold text-sm text-slate-300">
-                            <p>RAGAS & LangFuse</p>
-                            <p>Pydantic & Instructor</p>
-                            <p>ChromaDB & FAISS</p>
-                            <p>Embeddings & Semantic Search</p>
-                            <p>Transformers</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Backend & Automation -->
-                <div class="glass p-8 rounded-[2rem] tilt-card reveal" style="transition-delay: 0.2s">
-                    <div class="tilt-content">
-                        <div class="w-10 h-10 mb-6 rounded-xl bg-white/10 flex items-center justify-center text-white">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        </div>
-                        <h3 class="text-white text-xs font-black uppercase mb-4 tracking-widest">Backend & Auto</h3>
-                        <div class="space-y-2 font-bold text-sm text-slate-300">
-                            <p>FastAPI & REST APIs</p>
-                            <p>n8n Automation</p>
-                            <p>ElevenLabs & Twilio</p>
-                            <p>Docker & Supabase</p>
-                            <p>API Integrations</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Languages & Core -->
-                <div class="glass p-8 rounded-[2rem] tilt-card reveal" style="transition-delay: 0.3s">
-                    <div class="tilt-content">
-                        <div class="w-10 h-10 mb-6 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        </div>
-                        <h3 class="text-blue-400 text-xs font-black uppercase mb-4 tracking-widest">Languages & Tools</h3>
-                        <div class="space-y-2 font-bold text-sm text-slate-300">
-                            <p>Python <span class="text-[var(--teal)] opacity-60">(Core)</span></p>
-                            <p>C / C++</p>
-                            <p>Git / GitHub / Postman</p>
-                            <p>Streamlit</p>
-                            <p>CI/CD (basic)</p>
-                        </div>
-                    </div>
-                </div>
-
+      <div class="lg:col-span-4 card p-3 noise-overlay reveal float-slow" style="transition-delay:0.15s">
+        <div class="relative aspect-[4/5] rounded-2xl overflow-hidden">
+          <img src="20260520_174352.jpg" alt="Himanshu Dulhe" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent"></div>
+          <div class="absolute top-4 left-4">
+            <div class="font-mono text-[9px] tracking-widest text-cream/80 bg-ink/40 backdrop-blur px-2 py-1 rounded">REC / 2026</div>
+          </div>
+          <div class="absolute top-4 right-4">
+            <div class="font-mono text-[9px] tracking-widest text-cream/80 bg-terra/80 backdrop-blur px-2 py-1 rounded">LIVE</div>
+          </div>
+          <div class="absolute bottom-0 left-0 right-0 p-4">
+            <div class="bg-cream/90 backdrop-blur-xl rounded-xl p-3 flex items-center justify-between">
+              <div>
+                <div class="font-mono text-[9px] tracking-widest text-ink-soft">BASED IN</div>
+                <div class="text-xs font-bold mt-0.5">Greater Noida, India</div>
+              </div>
+              <div class="text-right">
+                <div class="font-mono text-[9px] tracking-widest text-ink-soft">28.47°N</div>
+                <div class="font-mono text-[9px] tracking-widest text-ink-soft">77.50°E</div>
+              </div>
             </div>
+          </div>
         </div>
-    </section>
+      </div>
 
-    <!-- Projects Section -->
-    <section id="projects" class="py-32 px-6">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-4xl md:text-6xl font-bold mb-20 text-center reveal tracking-tighter">Intelligent <span class="text-[var(--violet)]">Systems</span></h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                
-                <!-- Project 1 -->
-                <div class="glass rounded-[3rem] overflow-hidden reveal tilt-card">
-                    <div class="p-10 lg:p-12 tilt-content h-full flex flex-col">
-                        <div class="w-12 h-12 mb-8 rounded-2xl bg-[var(--teal)]/10 flex items-center justify-center text-[var(--teal)]">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold mb-4">RAG-Powered Invoice Compliance System</h3>
-                        <p class="text-sm text-slate-400 mb-6 leading-relaxed font-medium flex-grow">
-                            Dockerized FastAPI RAG service parsing invoices via Vision LLM into structured JSON, flagging anomalies like duplicates and incorrect amounts. Uses ChromaDB with text-embedding-3-small and recursive chunking (~500 tokens, 10% overlap) — validated on ~120 invoices with RAGAS Faithfulness 0.88, Relevance 0.91, Precision 0.85, cutting audit time by 75%.
-                        </p>
-                        <div class="flex items-center gap-6 font-black uppercase text-[11px] tracking-widest mt-auto pt-4 border-t border-white/10">
-                            <a href="https://compliance-audit-agent.streamlit.app/" target="_blank" class="text-[var(--teal)] hover:text-white transition">Live Demo ↗</a>
-                            <a href="https://github.com/Officialhimanshu710/compliance-audit-agent" target="_blank" class="text-white/40 hover:text-white transition">GitHub</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 2 -->
-                <div class="glass rounded-[3rem] overflow-hidden reveal tilt-card violet-hover" style="transition-delay: 0.1s">
-                    <div class="p-10 lg:p-12 tilt-content h-full flex flex-col">
-                        <div class="w-12 h-12 mb-8 rounded-2xl bg-[var(--violet)]/10 flex items-center justify-center text-[var(--violet)]">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold mb-4 text-[var(--violet)]">Intelligent Support Escalation Engine</h3>
-                        <p class="text-sm text-slate-400 mb-6 leading-relaxed font-medium flex-grow">
-                            n8n + LangChain pipeline classifying support messages into 5 intent categories — Bug, Billing, Feature Request, Urgent Outage, General — with ~90% routing accuracy across 75 tickets. Auto-creates Linear tickets and Telegram alerts, cutting triage effort by 85%.
-                        </p>
-                        <div class="flex items-center gap-6 font-black uppercase text-[11px] tracking-widest mt-auto pt-4 border-t border-white/10">
-                            <a href="https://www.linkedin.com/posts/himanshu-genai_generativeai-n8n-automation-activity-7434957113673572352-zCSE/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEQfde0BoXQke15sHvRzlyHB7erhmFBvE0k" target="_blank" class="text-[var(--violet)] hover:text-white transition">Live Video ↗</a>
-                            <a href="https://github.com/Officialhimanshu710/Intelligent_Support_Escalation_Engine" target="_blank" class="text-white/40 hover:text-white transition">GitHub</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 3 -->
-                <div class="glass rounded-[3rem] overflow-hidden reveal tilt-card" style="transition-delay: 0.2s">
-                    <div class="p-10 lg:p-12 tilt-content h-full flex flex-col">
-                        <div class="w-12 h-12 mb-8 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold mb-4">Fine-Tuned Interview Prep Assistant</h3>
-                        <p class="text-sm text-slate-400 mb-6 leading-relaxed font-medium flex-grow">
-                            Fine-tuned Mistral-7B on 15,000 instruction samples from Databricks Dolly-15k (80/10/10 split) via QLoRA + PEFT on a single GPU — ~70% compute reduction, improving RAGAS faithfulness from 0.64 to 0.82 versus the base model.
-                        </p>
-                        <div class="flex items-center gap-6 font-black uppercase text-[11px] tracking-widest mt-auto pt-4 border-t border-white/10">
-                            <a href="https://github.com/Officialhimanshu710/instruction-tuned-interview-assistant" target="_blank" class="text-white hover:text-[var(--teal)] transition">View Repository ↗</a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+      <div class="lg:col-span-3 grid grid-cols-2 lg:grid-cols-1 gap-4 reveal" style="transition-delay:0.25s">
+        <div class="card card-tilt p-6 noise-overlay float-slower" data-tilt>
+          <div class="card-tilt-inner">
+            <div class="stat-num" data-count="3">0<span class="italic-serif text-terra">+</span></div>
+            <div class="text-[10px] font-mono tracking-widest text-ink-soft mt-3">PRODUCTION<br/>AI SYSTEMS</div>
+          </div>
         </div>
-    </section>
+        <div class="card card-tilt p-6 noise-overlay float-slow" data-tilt style="animation-delay:-2s">
+          <div class="card-tilt-inner">
+            <div class="stat-num" data-count="91">0<span class="italic-serif text-terra">%</span></div>
+            <div class="text-[10px] font-mono tracking-widest text-ink-soft mt-3">RAGAS<br/>RELEVANCE</div>
+          </div>
+        </div>
+        <div class="card card-tilt p-6 noise-overlay" data-tilt>
+          <div class="card-tilt-inner">
+            <div class="stat-num" data-count="210">0<span class="italic-serif text-terra">+</span></div>
+            <div class="text-[10px] font-mono tracking-widest text-ink-soft mt-3">HOURS STRUCTURED<br/>ENGINEERING</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <!-- Experience, Education & Certifications -->
-    <section id="journey" class="py-24 px-6 relative">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
-            
-            <!-- Left Column: Experience & Education -->
-            <div class="space-y-12">
-                <div>
-                    <h2 class="text-3xl font-bold mb-8 reveal tracking-tight">Experience</h2>
+    <div class="mt-20 flex items-center gap-4 text-ink-soft reveal">
+      <div class="h-px flex-1 bg-ink/20"></div>
+      <span class="font-mono text-[10px] tracking-[0.3em]">SCROLL TO EXPLORE ↓</span>
+      <div class="h-px flex-1 bg-ink/20"></div>
+    </div>
+  </div>
+</section>
 
-                    <div class="glass p-8 rounded-[2rem] border-l-4 border-l-[var(--violet)] reveal tilt-card violet-hover mb-6">
-                        <div class="tilt-content">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-xl font-bold text-white">AI Intern</h3>
-                                <span class="text-xs font-mono text-[var(--violet)] bg-[var(--violet)]/10 px-3 py-1 rounded-full">Jun '26 - Present</span>
-                            </div>
-                            <p class="text-[var(--violet)] font-bold text-sm mb-4">Anvya AI &middot; AI Automation Startup, Noida</p>
-                            <ul class="text-sm text-slate-400 font-medium space-y-2 list-disc list-inside">
-                                <li>Built CRM export layer with an adapter pattern supporting Salesforce, HubSpot, and Zoho — syncs enriched lead data and AI call transcripts post-interaction; designed for zero-code CRM switching.</li>
-                                <li>Engineered agent orchestration with LangGraph; integrated Hunter.io for email, Twilio for WhatsApp, and ElevenLabs for AI voice calls — all triggered autonomously based on Groq/OpenAI lead scoring.</li>
-                                <li>Building Anvya SDR — scrapes and enriches LinkedIn leads via Apify, scores with LLMs, and auto-sequences multichannel outreach across email, WhatsApp, and voice for Indian SMBs.</li>
-                            </ul>
-                        </div>
-                    </div>
+<!-- MARQUEE -->
+<section class="py-10 border-y border-ink/10 overflow-hidden ticker bg-cream-dark noise-overlay">
+  <div class="marquee font-serif text-4xl md:text-7xl">
+    <span>Generative AI</span>
+    <span class="italic-serif text-terra">✦</span>
+    <span class="italic-serif">RAG Pipelines</span>
+    <span class="text-terra">✦</span>
+    <span>Agentic Workflows</span>
+    <span class="italic-serif text-terra">✦</span>
+    <span class="italic-serif">LLM Fine-Tuning</span>
+    <span class="text-terra">✦</span>
+    <span>Vision Models</span>
+    <span class="italic-serif text-terra">✦</span>
+    <span class="italic-serif">n8n Automation</span>
+    <span class="text-terra">✦</span>
+    <span>Generative AI</span>
+    <span class="italic-serif text-terra">✦</span>
+    <span class="italic-serif">RAG Pipelines</span>
+    <span class="text-terra">✦</span>
+    <span>Agentic Workflows</span>
+    <span class="italic-serif text-terra">✦</span>
+    <span class="italic-serif">LLM Fine-Tuning</span>
+    <span class="text-terra">✦</span>
+    <span>Vision Models</span>
+    <span class="italic-serif text-terra">✦</span>
+    <span class="italic-serif">n8n Automation</span>
+    <span class="text-terra">✦</span>
+  </div>
+</section>
 
-                    <div class="glass p-8 rounded-[2rem] border-l-4 border-l-[var(--teal)] reveal tilt-card">
-                        <div class="tilt-content">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-xl font-bold text-white">AI Engineering Trainee</h3>
-                                <span class="text-xs font-mono text-[var(--teal)] bg-[var(--teal)]/10 px-3 py-1 rounded-full">Dec '24 - Mar '25</span>
-                            </div>
-                            <p class="text-[var(--teal)] font-bold text-sm mb-4">HCLTech &middot; Greater Noida</p>
-                            <ul class="text-sm text-slate-400 font-medium space-y-2 list-disc list-inside">
-                                <li>Integrated OpenAI and Gemini APIs into backend workflows; built and tested LLM-powered REST API endpoints.</li>
-                                <li>Completed 210+ hours of structured training in backend architecture, REST API design, and scalable application patterns.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+<!-- ABOUT -->
+<section id="about" class="relative py-28 px-6 lg:px-10 overflow-hidden">
+  <div class="morph-shape" style="top:10%; left:-5%; width:400px; height:400px; opacity:0.07;"></div>
 
-                <div>
-                    <h2 class="text-3xl font-bold mb-8 reveal tracking-tight">Education</h2>
-                    <div class="glass p-8 rounded-[2rem] border-l-4 border-l-[var(--violet)] reveal tilt-card violet-hover">
-                        <div class="tilt-content">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-xl font-bold text-white">B.Tech (Computer Science & Engineering)</h3>
-                                <span class="text-xs font-mono text-[var(--violet)] bg-[var(--violet)]/10 px-3 py-1 rounded-full">2022 - 2026</span>
-                            </div>
-                            <p class="text-[var(--violet)] font-bold text-sm">KCC Institute of Technology (AKTU)</p>
-                        </div>
-                    </div>
-                </div>
+  <div class="max-w-7xl mx-auto relative">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-5 reveal">
+        <div class="section-label text-ink-soft mb-6">02 — ABOUT</div>
+        <h2 class="font-serif text-5xl md:text-7xl leading-[0.95] tracking-tighter">
+          Engineering <span class="italic-serif text-terra">intelligent</span> software at the frontier of AI.
+        </h2>
+
+        <div class="mt-12 flex items-start gap-4">
+          <div class="italic-serif text-terra text-6xl">✦</div>
+          <div class="mt-4">
+            <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-2">CURRENT FOCUS</div>
+            <ul class="text-sm space-y-1.5">
+              <li class="flex gap-2"><span class="text-terra">→</span> LangGraph agent orchestration</li>
+              <li class="flex gap-2"><span class="text-terra">→</span> Vision-Language Models</li>
+              <li class="flex gap-2"><span class="text-terra">→</span> Multi-LLM inference pipelines</li>
+              <li class="flex gap-2"><span class="text-terra">→</span> Autonomous SDR systems</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6 lg:col-start-7 reveal" style="transition-delay:0.1s">
+        <p class="text-lg leading-relaxed text-ink-soft font-medium">
+          I'm a Generative AI engineer who treats <span class="text-ink font-bold underline-grow">LLMs as reasoning engines</span>, not chat toys. My work spans the full AI stack — from prompt engineering and retrieval pipelines, to fine-tuning open-source models with QLoRA, to orchestrating autonomous multi-step agents.
+        </p>
+        <p class="mt-6 text-lg leading-relaxed text-ink-soft">
+          Recent builds: invoice compliance with <span class="italic-serif text-terra">Vision LLMs + RAG</span>, intelligent support triage with <span class="italic-serif text-terra">n8n + OpenAI structured output</span>, and fine-tuned interview assistants on <span class="italic-serif text-terra">Mistral-7B</span>. I bring the discipline of a 3+ year fitness athlete to every codebase — consistency beats intensity.
+        </p>
+
+        <div class="mt-12 space-y-6">
+          <div>
+            <div class="flex justify-between text-sm mb-2 font-medium">
+              <span>RAG &amp; Retrieval Systems</span>
+              <span class="font-mono text-xs text-terra">95%</span>
             </div>
+            <div class="skill-bar"><div style="width:95%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm mb-2 font-medium">
+              <span>Agentic Workflows (LangGraph, n8n)</span>
+              <span class="font-mono text-xs text-terra">92%</span>
+            </div>
+            <div class="skill-bar"><div style="width:92%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm mb-2 font-medium">
+              <span>LLM Fine-Tuning (QLoRA / PEFT)</span>
+              <span class="font-mono text-xs text-terra">88%</span>
+            </div>
+            <div class="skill-bar"><div style="width:88%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm mb-2 font-medium">
+              <span>Backend &amp; FastAPI</span>
+              <span class="font-mono text-xs text-terra">85%</span>
+            </div>
+            <div class="skill-bar"><div style="width:85%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-sm mb-2 font-medium">
+              <span>Evaluation (RAGAS, LangFuse)</span>
+              <span class="font-mono text-xs text-terra">87%</span>
+            </div>
+            <div class="skill-bar"><div style="width:87%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-            <!-- Right Column: Certifications -->
+<!-- ===== SKILLS (REDESIGNED) ===== -->
+<section id="skills" class="relative py-28 px-6 lg:px-10 bg-cream-dark noise-overlay border-y border-ink/5 overflow-hidden">
+  <div class="morph-shape" style="bottom:-10%; right:-5%; width:450px; height:450px; opacity:0.08;"></div>
+
+  <div class="max-w-7xl mx-auto relative">
+    <!-- Header -->
+    <div class="flex flex-wrap items-end justify-between gap-8 mb-16 reveal">
+      <div>
+        <div class="section-label text-ink-soft mb-6">03 — TECHNICAL ARSENAL</div>
+        <h2 class="font-serif text-5xl md:text-7xl leading-[0.95] tracking-tighter max-w-2xl">
+          The <span class="italic-serif text-terra">stack</span> behind every system I ship.
+        </h2>
+      </div>
+      <p class="text-sm text-ink-soft max-w-sm font-medium leading-relaxed">
+        Four pillars, refined over hundreds of hours of shipping. Each tool earned its place through real production use — not tutorial hype.
+      </p>
+    </div>
+
+    <!-- Topology visualization -->
+    <div class="card card-tilt p-8 md:p-12 mb-10 noise-overlay reveal" data-tilt>
+      <div class="card-tilt-inner grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div>
+          <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-3">THE AI ENGINEER'S TOPOLOGY</div>
+          <h3 class="font-serif text-3xl md:text-4xl mb-4">A unified <span class="italic-serif text-terra">reasoning</span> stack.</h3>
+          <p class="text-ink-soft leading-relaxed text-sm mb-6">
+            I don't collect tools — I compose pipelines. From ingestion to inference, every layer talks to the next. Hover any node to see where it lives in my daily workflow.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="metric-pill"><span class="big">28+</span> production tools</span>
+            <span class="metric-pill"><span class="big">4</span> core pillars</span>
+            <span class="metric-pill"><span class="big">3+</span> yrs Python</span>
+          </div>
+        </div>
+        <div class="stack-ring">
+          <div class="ring"></div>
+          <div class="ring-2"></div>
+          <div class="center">
             <div>
-                <h2 class="text-3xl font-bold mb-8 reveal tracking-tight">Certifications</h2>
-                <div class="space-y-4">
-                    
-                    <a href="https://drive.google.com/file/d/1gjvYDwCl8t5vdQwmdOPqvTBbHj8ue5vt/view?usp=drive_link" target="_blank" class="block glass p-6 rounded-[1.5rem] group hover:border-[var(--teal)] transition-colors reveal tilt-card">
-                        <div class="flex items-center gap-4 tilt-content">
-                            <div class="w-10 h-10 rounded-lg bg-[var(--teal)]/10 flex items-center justify-center text-[var(--teal)] group-hover:bg-[var(--teal)] group-hover:text-black transition-colors shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white group-hover:text-[var(--teal)] transition-colors">Fundamental of AI and ML</h4>
-                                <p class="text-xs text-slate-500 mt-1 font-medium">AWS Training and Certification</p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="https://drive.google.com/file/d/1cYmT81ZVuOD8qEpk4AeIdNCcrIVJv21a/view?usp=drive_link" target="_blank" class="block glass p-6 rounded-[1.5rem] group hover:border-[var(--teal)] transition-colors reveal tilt-card" style="transition-delay: 0.1s">
-                        <div class="flex items-center gap-4 tilt-content">
-                            <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-black transition-colors shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white group-hover:text-orange-400 transition-colors">Getting Started with Cloud Essentials</h4>
-                                <p class="text-xs text-slate-500 mt-1 font-medium">AWS Training and Certification</p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <div class="block glass p-6 rounded-[1.5rem] reveal tilt-card" style="transition-delay: 0.2s">
-                        <div class="flex items-center gap-4 tilt-content">
-                            <div class="w-10 h-10 rounded-lg bg-[var(--violet)]/10 flex items-center justify-center text-[var(--violet)] shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white">AI Foundations Associate (2025)</h4>
-                                <p class="text-xs text-slate-500 mt-1 font-medium">Oracle Cloud Infrastructure</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="block glass p-6 rounded-[1.5rem] reveal tilt-card" style="transition-delay: 0.3s">
-                        <div class="flex items-center gap-4 tilt-content">
-                            <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white">Introduction to Generative AI</h4>
-                                <p class="text-xs text-slate-500 mt-1 font-medium">Simplilearn (with Google Cloud)</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <a href="https://drive.google.com/file/d/1aXRwggwiG_DQ6gu4VzyxbXFN69DEHlqp/view?usp=drive_link" target="_blank" class="block glass p-6 rounded-[1.5rem] group hover:border-green-500 transition-colors reveal tilt-card" style="transition-delay: 0.4s">
-                        <div class="flex items-center gap-4 tilt-content">
-                            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400 group-hover:bg-green-500 group-hover:text-black transition-colors shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white group-hover:text-green-400 transition-colors">Python (Basic) Certificate</h4>
-                                <p class="text-xs text-slate-500 mt-1 font-medium">HackerRank</p>
-                            </div>
-                        </div>
-                    </a>
-
-                </div>
+              <div class="font-mono text-[9px] tracking-widest opacity-60">CORE</div>
+              <div class="font-serif italic text-2xl mt-1">Python</div>
             </div>
-
+          </div>
+          <!-- Orbit items -->
+          <div class="stack-orbit-item" style="top:-5%; left:45%;" title="LangChain">LC</div>
+          <div class="stack-orbit-item" style="top:10%; right:0%;" title="LangGraph">LG</div>
+          <div class="stack-orbit-item" style="top:42%; right:-8%;" title="FastAPI">FA</div>
+          <div class="stack-orbit-item" style="bottom:10%; right:5%;" title="ChromaDB">CD</div>
+          <div class="stack-orbit-item" style="bottom:-5%; left:42%;" title="QLoRA">QL</div>
+          <div class="stack-orbit-item" style="bottom:10%; left:0%;" title="OpenAI">OA</div>
+          <div class="stack-orbit-item" style="top:42%; left:-8%;" title="n8n">n8n</div>
+          <div class="stack-orbit-item" style="top:10%; left:5%;" title="Groq">GQ</div>
         </div>
-    </section>
+      </div>
+    </div>
 
-    <!-- Contact Section -->
-    <section id="contact" class="py-32 px-6">
-        <div class="max-w-6xl mx-auto glass rounded-[4rem] p-10 md:p-20 reveal border-[var(--violet)]/20 hover:border-[var(--violet)]/50 transition-colors">
-            <div class="text-center mb-24">
-                <h2 class="text-5xl md:text-7xl font-bold mb-8 leading-tight tracking-tighter">
-                    Let’s Build <span class="text-[var(--teal)]">Intelligent</span> AI <br> 
-                    <span class="text-[var(--violet)]">Systems</span> Together
-                </h2>
-                <p class="text-slate-400 text-lg font-medium opacity-80">Looking for a Generative AI Engineer? Let's create something extraordinary.</p>
+    <!-- 4 Arsenal Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- Pillar 1: GenAI & LLMs -->
+      <div class="arsenal-card reveal" data-arsenal>
+        <div class="arsenal-number">01</div>
+        <div class="relative">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(232,85,46,0.12);">
+              <svg class="w-5 h-5" style="color:var(--terra)" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
-
-            <div class="grid md:grid-cols-2 gap-20 items-start">
-                <div class="space-y-8">
-                    <div class="space-y-3">
-                        <label class="text-[11px] font-black uppercase tracking-[0.2em] opacity-40">Name</label>
-                        <input type="text" id="contactName" placeholder="Your Name" class="w-full p-6 rounded-2xl">
-                    </div>
-                    <div class="space-y-3">
-                        <label class="text-[11px] font-black uppercase tracking-[0.2em] opacity-40">Email</label>
-                        <input type="email" id="contactEmail" placeholder="your@email.com" class="w-full p-6 rounded-2xl">
-                    </div>
-                    <div class="space-y-3">
-                        <label class="text-[11px] font-black uppercase tracking-[0.2em] opacity-40">Message</label>
-                        <textarea id="contactMessage" placeholder="Tell me about your project or role..." rows="4" class="w-full p-6 rounded-2xl"></textarea>
-                    </div>
-                    <button onclick="sendMail()" class="btn-teal w-full py-6 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] mt-4">Send Message</button>
-                </div>
-
-                <div class="space-y-6">
-                    <a href="https://www.linkedin.com/in/himanshu-genai/" target="_blank" class="glass p-8 rounded-[2.5rem] flex items-center justify-between group hover:border-[var(--teal)] transition-all">
-                        <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-[var(--teal)]/10 flex items-center justify-center text-[var(--teal)] group-hover:bg-[var(--teal)] group-hover:text-dark transition-all duration-500">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-xl">LinkedIn</h4>
-                                <p class="text-sm opacity-50 font-medium">Connect professionally</p>
-                            </div>
-                        </div>
-                        <span class="opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">↗</span>
-                    </a>
-
-                    <a href="https://github.com/Officialhimanshu710" target="_blank" class="glass p-8 rounded-[2.5rem] flex items-center justify-between group hover:border-[var(--violet)] transition-all">
-                        <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-[var(--violet)]/10 flex items-center justify-center text-[var(--violet)] group-hover:bg-[var(--violet)] group-hover:text-white transition-all duration-500">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-xl">GitHub</h4>
-                                <p class="text-sm opacity-50 font-medium">Explore source code</p>
-                            </div>
-                        </div>
-                        <span class="opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">↗</span>
-                    </a>
-
-                    <a href="mailto:chaudharyhimanshu710@gmail.com" class="glass p-8 rounded-[2.5rem] flex items-center justify-between group hover:border-[var(--teal)] transition-all">
-                        <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-[var(--teal)]/10 flex items-center justify-center text-[var(--teal)] group-hover:bg-[var(--teal)] group-hover:text-dark transition-all duration-500 shrink-0">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            </div>
-                            <div class="w-full overflow-hidden">
-                                <h4 class="font-bold text-xl">Email</h4>
-                                <p class="text-sm opacity-50 font-medium break-all">chaudharyhimanshu710@gmail.com</p>
-                            </div>
-                        </div>
-                        <span class="opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">↗</span>
-                    </a>
-
-                    <a href="tel:+919999842513" class="glass p-8 rounded-[2.5rem] flex items-center justify-between group hover:border-[var(--violet)] transition-all">
-                        <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-[var(--violet)]/10 flex items-center justify-center text-[var(--violet)] group-hover:bg-[var(--violet)] group-hover:text-white transition-all duration-500 shrink-0">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-xl">Phone</h4>
-                                <p class="text-sm opacity-50 font-medium">+91 99998 42513</p>
-                            </div>
-                        </div>
-                        <span class="opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">↗</span>
-                    </a>
-                </div>
+            <div>
+              <h3 class="font-serif text-2xl">GenAI &amp; LLMs</h3>
+              <p class="italic-serif text-sm" style="color:var(--terra)">The reasoning layer</p>
             </div>
-            
-            <div class="mt-32 pt-10 border-t border-white/5 text-center flex flex-col items-center justify-center">
-                <p class="text-[10px] font-black uppercase tracking-[0.5em] opacity-30">© 2026 Himanshu Dulhe</p>
-                <p class="text-[10px] font-medium uppercase tracking-widest text-white/20 mt-2">Generative AI Engineer • Based in Greater Noida</p>
+          </div>
+
+          <!-- Category proficiency -->
+          <div class="mb-5">
+            <div class="flex justify-between text-xs mb-2 font-medium">
+              <span>Overall proficiency</span>
+              <span class="font-mono text-[10px] text-terra">95%</span>
             </div>
+            <div class="skill-bar"><div style="width:95%; background:linear-gradient(90deg, var(--terra), var(--ochre));"></div></div>
+          </div>
+
+          <!-- Tool list with individual proficiency -->
+          <div class="space-y-3 mb-5">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">LangChain / LangGraph</span>
+              <div class="proficiency-dots" title="Expert">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">QLoRA / PEFT</span>
+              <div class="proficiency-dots" title="Advanced">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">OpenAI / Groq / Gemini APIs</span>
+              <div class="proficiency-dots" title="Expert">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">Prompt Engineering</span>
+              <div class="proficiency-dots" title="Expert">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-ink/10">
+            <div class="font-mono text-[9px] tracking-widest text-ink-soft mb-2">USED IN</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="tag text-[9px]">Interview Assistant</span>
+              <span class="tag text-[9px]">Anvya SDR</span>
+            </div>
+          </div>
         </div>
-    </section>
+      </div>
 
-    <script>
-        // --- MOBILE MENU LOGIC ---
-        const mobileBtn = document.getElementById('mobile-menu-btn');
-        const closeBtn = document.getElementById('close-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileLinks = document.querySelectorAll('.mobile-link');
+      <!-- Pillar 2: Retrieval & Eval -->
+      <div class="arsenal-card reveal" data-arsenal style="transition-delay:0.1s">
+        <div class="arsenal-number">02</div>
+        <div class="relative">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(42,157,143,0.15);">
+              <svg class="w-5 h-5" style="color:var(--teal)" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <div>
+              <h3 class="font-serif text-2xl">Eval &amp; Retrieval</h3>
+              <p class="italic-serif text-sm" style="color:var(--teal)">Grounded &amp; measured</p>
+            </div>
+          </div>
 
-        function toggleMenu() {
-            mobileMenu.classList.toggle('translate-x-full');
-            document.body.classList.toggle('overflow-hidden'); 
-        }
+          <div class="mb-5">
+            <div class="flex justify-between text-xs mb-2 font-medium">
+              <span>Overall proficiency</span>
+              <span class="font-mono text-[10px]" style="color:var(--teal)">92%</span>
+            </div>
+            <div class="skill-bar"><div style="width:92%; background:linear-gradient(90deg, var(--teal), #4dc3b4);"></div></div>
+          </div>
 
-        if(mobileBtn) mobileBtn.addEventListener('click', toggleMenu);
-        if(closeBtn) closeBtn.addEventListener('click', toggleMenu);
+          <div class="space-y-3 mb-5">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">ChromaDB / FAISS</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">RAGAS Evaluation</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">LangFuse Observability</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">Pydantic / Instructor</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+          </div>
 
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', toggleMenu);
+          <div class="pt-4 border-t border-ink/10">
+            <div class="font-mono text-[9px] tracking-widest text-ink-soft mb-2">USED IN</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="tag text-[9px]">Invoice Compliance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pillar 3: Backend & Automation -->
+      <div class="arsenal-card reveal" data-arsenal style="transition-delay:0.2s">
+        <div class="arsenal-number">03</div>
+        <div class="relative">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(212,150,61,0.15);">
+              <svg class="w-5 h-5" style="color:var(--ochre)" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div>
+              <h3 class="font-serif text-2xl">Backend &amp; Automation</h3>
+              <p class="italic-serif text-sm" style="color:var(--ochre)">Plumbing &amp; orchestration</p>
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <div class="flex justify-between text-xs mb-2 font-medium">
+              <span>Overall proficiency</span>
+              <span class="font-mono text-[10px]" style="color:var(--ochre)">88%</span>
+            </div>
+            <div class="skill-bar"><div style="width:88%; background:linear-gradient(90deg, var(--ochre), #e6b264);"></div></div>
+          </div>
+
+          <div class="space-y-3 mb-5">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">FastAPI / REST APIs</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">n8n Workflow Engine</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">Docker / Supabase</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">Twilio / ElevenLabs / Apify</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span><span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-ink/10">
+            <div class="font-mono text-[9px] tracking-widest text-ink-soft mb-2">USED IN</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="tag text-[9px]">Support Escalation</span>
+              <span class="tag text-[9px]">Anvya AI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pillar 4: Languages & Tools -->
+      <div class="arsenal-card reveal" data-arsenal style="transition-delay:0.3s">
+        <div class="arsenal-number">04</div>
+        <div class="relative">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: rgba(107,142,94,0.2);">
+              <svg class="w-5 h-5" style="color:var(--sage)" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <h3 class="font-serif text-2xl">Languages &amp; Tools</h3>
+              <p class="italic-serif text-sm" style="color:var(--sage)">The fundamentals</p>
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <div class="flex justify-between text-xs mb-2 font-medium">
+              <span>Overall proficiency</span>
+              <span class="font-mono text-[10px]" style="color:var(--sage)">90%</span>
+            </div>
+            <div class="skill-bar"><div style="width:90%; background:linear-gradient(90deg, var(--sage), #8bae7d);"></div></div>
+          </div>
+
+          <div class="space-y-3 mb-5">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">Python <span class="italic-serif text-terra">(3+ years)</span></span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">C / C++</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">Git / GitHub / Postman</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold">Streamlit / CI-CD</span>
+              <div class="proficiency-dots">
+                <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="accent"></span><span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-ink/10">
+            <div class="font-mono text-[9px] tracking-widest text-ink-soft mb-2">CERTIFIED</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="tag text-[9px] bg-sage/15 border-sage/30" style="color:var(--sage)">HackerRank Python</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Drivers -->
+    <div class="card card-tilt p-8 md:p-10 mt-10 noise-overlay reveal" data-tilt style="transition-delay:0.15s">
+      <div class="card-tilt-inner">
+        <div class="flex flex-wrap items-start justify-between gap-6 mb-8">
+          <div>
+            <div class="section-label text-ink-soft mb-3">DAILY DRIVERS</div>
+            <h3 class="font-serif text-3xl md:text-4xl">The tools I open <span class="italic-serif text-terra">every single day</span>.</h3>
+          </div>
+          <div class="font-mono text-[10px] tracking-widest text-ink-soft self-end">UPDATED · JUL 2026</div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="tool-chip"><span class="dot" style="background:var(--terra)"></span> Python</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--teal)"></span> FastAPI</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--ochre)"></span> LangGraph</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--sage)"></span> ChromaDB</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--violet)"></span> OpenAI API</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--terra)"></span> Groq</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--teal)"></span> n8n</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--ochre)"></span> Docker</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--sage)"></span> Pydantic</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--violet)"></span> RAGAS</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--terra)"></span> Git</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--teal)"></span> VS Code</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--ochre)"></span> Cursor</span>
+          <span class="tool-chip"><span class="dot" style="background:var(--sage)"></span> Postman</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="relative py-28 px-6 lg:px-10 overflow-hidden">
+  <div class="blob" style="top:30%; right:-15%; width:450px; height:450px; background:var(--ochre);"></div>
+
+  <div class="max-w-7xl mx-auto relative">
+    <div class="flex flex-wrap items-end justify-between gap-6 mb-16 reveal">
+      <div>
+        <div class="section-label text-ink-soft mb-6">04 — SELECTED WORK</div>
+        <h2 class="font-serif text-5xl md:text-7xl leading-[0.95] tracking-tighter">
+          Intelligent <span class="italic-serif text-terra">systems</span><br/>shipped to production.
+        </h2>
+      </div>
+      <a href="https://github.com/Officialhimanshu710?tab=repositories" target="_blank" class="link-arrow font-mono text-xs tracking-widest">
+        ALL REPOSITORIES
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+      </a>
+    </div>
+
+    <!-- Project 1: Featured -->
+    <div class="project-card card card-tilt mb-8 noise-overlay reveal" data-tilt>
+      <div class="card-tilt-inner">
+        <div class="grid grid-cols-1 lg:grid-cols-2">
+          <div class="cover relative aspect-[4/3] lg:aspect-auto overflow-hidden rounded-tl-[22px] lg:rounded-tr-none lg:rounded-bl-[22px] bg-cream-3">
+            <img src="https://image.qwenlm.ai/public_source/3144fad0-461b-41c7-9c15-22ff1f9d4f1f/1f16da75c-ce6b-4f30-ae14-c9ba64396ebb.png" alt="Invoice Compliance" class="w-full h-full object-cover" />
+            <div class="cover-overlay"></div>
+            <div class="absolute top-4 left-4 flex gap-2">
+              <span class="tag bg-ink text-cream border-transparent">FLAGSHIP</span>
+              <span class="tag bg-cream/90 border-transparent backdrop-blur">VISION LLM</span>
+            </div>
+          </div>
+          <div class="p-8 lg:p-12 flex flex-col">
+            <div>
+              <div class="flex items-center gap-3 mb-4">
+                <span class="font-mono text-[10px] tracking-widest text-ink-soft">001 / RAG · FASTAPI · CHROMA</span>
+              </div>
+              <h3 class="font-serif text-3xl md:text-5xl leading-[0.95]">RAG-Powered Invoice Compliance System</h3>
+              <p class="italic-serif text-terra text-lg md:text-xl mt-3">Vision LLM parsing invoices into structured JSON.</p>
+              <p class="mt-5 text-ink-soft leading-relaxed text-sm md:text-base">
+                Dockerized FastAPI service flagging duplicates, incorrect amounts &amp; anomalies. Built with <span class="text-ink font-semibold">text-embedding-3-small</span> and recursive chunking (~500 tokens, 10% overlap). Validated on ~120 real invoices.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 my-8 py-6 border-y border-ink/10">
+              <div>
+                <div class="font-serif text-3xl md:text-4xl text-terra">0.91</div>
+                <div class="text-[9px] font-mono tracking-widest text-ink-soft mt-1">RAGAS RELEVANCE</div>
+              </div>
+              <div>
+                <div class="font-serif text-3xl md:text-4xl">0.88</div>
+                <div class="text-[9px] font-mono tracking-widest text-ink-soft mt-1">FAITHFULNESS</div>
+              </div>
+              <div>
+                <div class="font-serif text-3xl md:text-4xl" style="color:var(--teal)">-75%</div>
+                <div class="text-[9px] font-mono tracking-widest text-ink-soft mt-1">AUDIT TIME</div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 mt-auto">
+              <span class="tag">FastAPI</span>
+              <span class="tag">ChromaDB</span>
+              <span class="tag">Docker</span>
+              <span class="tag">RAGAS</span>
+              <a href="https://compliance-audit-agent.streamlit.app/" target="_blank" class="btn btn-primary ml-auto magnetic text-xs">
+                Live Demo
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects 2 & 3 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="project-card card card-tilt noise-overlay reveal" data-tilt style="transition-delay:0.1s">
+        <div class="card-tilt-inner">
+          <div class="cover relative aspect-[16/10] overflow-hidden rounded-t-[22px] bg-cream-3">
+            <img src="https://image.qwenlm.ai/public_source/3144fad0-461b-41c7-9c15-22ff1f9d4f1f/192106d44-d551-46a8-9ff8-5ff552065e0a.png" alt="Support Escalation" class="w-full h-full object-cover" />
+            <div class="cover-overlay"></div>
+            <div class="absolute top-4 left-4">
+              <span class="tag bg-terra text-cream border-transparent">AGENT WORKFLOW</span>
+            </div>
+          </div>
+          <div class="p-7">
+            <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-3">002 / N8N · OPENAI · LINEAR</div>
+            <h3 class="font-serif text-2xl md:text-3xl leading-tight">Intelligent Support Escalation Engine</h3>
+            <p class="italic-serif text-terra mt-1">Autonomous triage with ~90% routing accuracy.</p>
+            <p class="mt-4 text-sm text-ink-soft leading-relaxed">
+              Pipeline classifying support messages into 5 intents via OpenAI structured output. Auto-creates <span class="text-ink font-semibold">Linear tickets</span> &amp; <span class="text-ink font-semibold">Telegram alerts</span>, cutting triage effort by 85%.
+            </p>
+            <div class="flex flex-wrap gap-1.5 mt-5">
+              <span class="tag">n8n</span>
+              <span class="tag">OpenAI</span>
+              <span class="tag">Linear API</span>
+              <span class="tag">Telegram</span>
+            </div>
+            <div class="flex items-center justify-between mt-6 pt-5 border-t border-ink/10">
+              <a href="https://www.linkedin.com/posts/himanshu-genai_generativeai-n8n-automation-activity-7434957113673572352-zCSE/" target="_blank" class="link-arrow font-mono text-[11px] tracking-widest">
+                WATCH DEMO
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+              <a href="https://github.com/Officialhimanshu710/Intelligent_Support_Escalation_Engine" target="_blank" class="link-arrow font-mono text-[11px] tracking-widest text-ink-soft">
+                GITHUB
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card card card-tilt noise-overlay reveal" data-tilt style="transition-delay:0.2s">
+        <div class="card-tilt-inner">
+          <div class="cover relative aspect-[16/10] overflow-hidden rounded-t-[22px] bg-cream-3">
+            <img src="https://image.qwenlm.ai/public_source/3144fad0-461b-41c7-9c15-22ff1f9d4f1f/16a8069c0-c33c-4aad-ac1b-d33be11a133e.png" alt="Interview Assistant" class="w-full h-full object-cover" />
+            <div class="cover-overlay"></div>
+            <div class="absolute top-4 left-4">
+              <span class="tag bg-ink text-cream border-transparent">FINE-TUNING</span>
+            </div>
+          </div>
+          <div class="p-7">
+            <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-3">003 / MISTRAL-7B · QLoRA · PEFT</div>
+            <h3 class="font-serif text-2xl md:text-3xl leading-tight">Instruction-Tuned Interview Assistant</h3>
+            <p class="italic-serif mt-1" style="color:var(--teal)">Mistral-7B, fine-tuned with surgical precision.</p>
+            <p class="mt-4 text-sm text-ink-soft leading-relaxed">
+              Fine-tuned Mistral-7B on 15k Databricks Dolly instruction samples via <span class="text-ink font-semibold">QLoRA (r=8, α=16)</span> on a single GPU. ~70% compute reduction, improving RAGAS faithfulness <span class="text-terra font-semibold">0.64 → 0.82</span>.
+            </p>
+            <div class="flex flex-wrap gap-1.5 mt-5">
+              <span class="tag">Mistral-7B</span>
+              <span class="tag">QLoRA</span>
+              <span class="tag">BitsAndBytes</span>
+              <span class="tag">SFTTrainer</span>
+            </div>
+            <div class="flex items-center justify-between mt-6 pt-5 border-t border-ink/10">
+              <a href="https://github.com/Officialhimanshu710/instruction-tuned-interview-assistant" target="_blank" class="link-arrow font-mono text-[11px] tracking-widest">
+                VIEW REPO
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+              <span class="font-mono text-[10px] tracking-widest text-terra">+0.18 FAITHFULNESS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== JOURNEY (REDESIGNED) ===== -->
+<section id="journey" class="relative py-28 px-6 lg:px-10 overflow-hidden">
+  <div class="blob" style="top:10%; left:-10%; width:400px; height:400px; background:var(--terra);"></div>
+  <div class="morph-shape" style="bottom:5%; right:-5%; width:400px; height:400px; opacity:0.08;"></div>
+
+  <div class="max-w-7xl mx-auto relative">
+    <div class="flex flex-wrap items-end justify-between gap-6 mb-16 reveal">
+      <div>
+        <div class="section-label text-ink-soft mb-6">05 — JOURNEY &amp; CREDENTIALS</div>
+        <h2 class="font-serif text-5xl md:text-7xl leading-[0.95] tracking-tighter max-w-3xl">
+          From curious undergrad to <span class="italic-serif text-terra">shipping</span> production AI.
+        </h2>
+      </div>
+      <p class="text-sm text-ink-soft max-w-sm font-medium leading-relaxed">
+        Every milestone below is backed by a credential, a commit, or a shipped system. No fluff — just proof of work.
+      </p>
+    </div>
+
+    <!-- Journey stats strip -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16 reveal" style="transition-delay:0.1s">
+      <div class="card p-5 text-center noise-overlay">
+        <div class="font-serif text-4xl md:text-5xl" data-count="210">0<span class="italic-serif text-terra">+</span></div>
+        <div class="text-[10px] font-mono tracking-widest text-ink-soft mt-2">STRUCTURED TRAINING HOURS</div>
+      </div>
+      <div class="card p-5 text-center noise-overlay">
+        <div class="font-serif text-4xl md:text-5xl"><span class="italic-serif text-terra">5</span></div>
+        <div class="text-[10px] font-mono tracking-widest text-ink-soft mt-2">INDUSTRY CERTIFICATIONS</div>
+      </div>
+      <div class="card p-5 text-center noise-overlay">
+        <div class="font-serif text-4xl md:text-5xl"><span class="italic-serif text-terra">2</span></div>
+        <div class="text-[10px] font-mono tracking-widest text-ink-soft mt-2">PROFESSIONAL ROLES</div>
+      </div>
+      <div class="card p-5 text-center noise-overlay">
+        <div class="font-serif text-4xl md:text-5xl"><span class="italic-serif text-terra">B.Tech</span></div>
+        <div class="text-[10px] font-mono tracking-widest text-ink-soft mt-2">CSE · CLASS OF 2026</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <!-- Left column: Experience timeline -->
+      <div class="lg:col-span-7 reveal">
+        <div class="flex items-center gap-3 mb-10">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(232,85,46,0.15);">
+            <svg class="w-5 h-5" style="color:var(--terra)" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <div class="font-mono text-[10px] tracking-widest text-ink-soft">05.1</div>
+            <h3 class="font-serif text-3xl">Professional Experience</h3>
+          </div>
+        </div>
+
+        <div class="relative pl-10 border-l border-ink/15 space-y-10">
+          <!-- Anvya AI -->
+          <div class="timeline-item relative">
+            <div class="card card-tilt p-7 noise-overlay" data-tilt>
+              <div class="card-tilt-inner">
+                <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+                  <div>
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="pulse-dot" style="background:var(--terra);"></span>
+                      <span class="tag bg-terra text-cream border-transparent text-[9px]">CURRENT ROLE</span>
+                    </div>
+                    <h4 class="font-serif text-2xl md:text-3xl">AI Intern</h4>
+                    <p class="text-terra font-bold text-sm mt-1">Anvya AI · AI Automation Startup</p>
+                    <p class="font-mono text-[10px] tracking-widest text-ink-soft mt-1">NOIDA, INDIA</p>
+                  </div>
+                  <span class="font-mono text-xs text-ink-soft bg-cream px-3 py-1.5 rounded-full border border-ink/10">JUN '26 — NOW</span>
+                </div>
+
+                <ul class="text-sm text-ink-soft font-medium space-y-3 leading-relaxed mt-5">
+                  <li class="flex gap-3"><span class="text-terra shrink-0 font-bold">→</span><span>Built <span class="text-ink font-semibold">CRM export layer</span> with adapter pattern supporting Salesforce, HubSpot &amp; Zoho — syncs enriched lead data + AI transcripts; designed for zero-code CRM switching.</span></li>
+                  <li class="flex gap-3"><span class="text-terra shrink-0 font-bold">→</span><span>Engineered <span class="text-ink font-semibold">LangGraph agent orchestration</span> integrating Hunter.io (email), Twilio (WhatsApp), ElevenLabs (AI voice) — triggered autonomously via Groq/OpenAI lead scoring.</span></li>
+                  <li class="flex gap-3"><span class="text-terra shrink-0 font-bold">→</span><span>Building <span class="italic-serif text-terra">Anvya SDR</span> — scrapes &amp; enriches LinkedIn leads via Apify, scores with LLMs, auto-sequences multichannel outreach across email, WhatsApp &amp; voice for Indian SMBs.</span></li>
+                </ul>
+
+                <div class="flex flex-wrap gap-1.5 mt-6 pt-5 border-t border-ink/10">
+                  <span class="tag text-[9px]">LangGraph</span>
+                  <span class="tag text-[9px]">Twilio</span>
+                  <span class="tag text-[9px]">ElevenLabs</span>
+                  <span class="tag text-[9px]">Apify</span>
+                  <span class="tag text-[9px]">Groq</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HCL -->
+          <div class="timeline-item relative">
+            <div class="card card-tilt p-7 noise-overlay" data-tilt>
+              <div class="card-tilt-inner">
+                <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+                  <div>
+                    <h4 class="font-serif text-2xl md:text-3xl">AI Engineering Trainee</h4>
+                    <p class="font-bold text-sm mt-1" style="color:var(--teal)">HCLTech · Enterprise Software</p>
+                    <p class="font-mono text-[10px] tracking-widest text-ink-soft mt-1">GREATER NOIDA, INDIA</p>
+                  </div>
+                  <span class="font-mono text-xs text-ink-soft bg-cream px-3 py-1.5 rounded-full border border-ink/10">DEC '24 — MAR '25</span>
+                </div>
+
+                <ul class="text-sm text-ink-soft font-medium space-y-3 leading-relaxed mt-5">
+                  <li class="flex gap-3"><span class="shrink-0 font-bold" style="color:var(--teal)">→</span><span>Integrated <span class="text-ink font-semibold">OpenAI &amp; Gemini APIs</span> into production backend workflows; built &amp; tested LLM-powered REST API endpoints under senior engineer mentorship.</span></li>
+                  <li class="flex gap-3"><span class="shrink-0 font-bold" style="color:var(--teal)">→</span><span>Completed <span class="text-ink font-semibold">210+ hours</span> of structured training in backend architecture, REST API design, scalable application patterns &amp; enterprise coding standards.</span></li>
+                  <li class="flex gap-3"><span class="shrink-0 font-bold" style="color:var(--teal)">→</span><span>Collaborated with cross-functional teams on internal tooling; learned production incident response &amp; code review culture at enterprise scale.</span></li>
+                </ul>
+
+                <div class="flex flex-wrap gap-3 mt-6 pt-5 border-t border-ink/10">
+                  <span class="metric-pill"><span class="big" style="color:var(--teal)">210+</span> training hrs</span>
+                  <span class="metric-pill"><span class="big" style="color:var(--teal)">4</span> months</span>
+                  <span class="metric-pill"><span class="big" style="color:var(--teal)">1:1</span> mentorship</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="mt-16">
+          <div class="flex items-center gap-3 mb-10">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(122,90,240,0.15);">
+              <svg class="w-5 h-5" style="color:var(--violet)" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+            </div>
+            <div>
+              <div class="font-mono text-[10px] tracking-widest text-ink-soft">05.2</div>
+              <h3 class="font-serif text-3xl">Education</h3>
+            </div>
+          </div>
+
+          <div class="card card-tilt p-7 noise-overlay" data-tilt>
+            <div class="card-tilt-inner">
+              <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+                <div>
+                  <h4 class="font-serif text-2xl md:text-3xl">B.Tech · Computer Science &amp; Engineering</h4>
+                  <p class="font-bold text-sm mt-1" style="color:var(--violet)">KCC Institute of Technology &amp; Management</p>
+                  <p class="font-mono text-[10px] tracking-widest text-ink-soft mt-1">AFFILIATED TO AKTU · LUCKNOW</p>
+                </div>
+                <span class="font-mono text-xs text-ink-soft bg-cream px-3 py-1.5 rounded-full border border-ink/10">2022 — 2026</span>
+              </div>
+
+              <p class="text-sm text-ink-soft font-medium leading-relaxed mt-4">
+                Concentrated coursework in machine learning, data structures, algorithms &amp; distributed systems. Active contributor to AI/ML study circles and hackathons. Building my capstone around autonomous AI agents for SMB sales workflows.
+              </p>
+
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-5 border-t border-ink/10">
+                <div>
+                  <div class="font-mono text-[9px] tracking-widest text-ink-soft mb-1">FOCUS</div>
+                  <div class="text-xs font-bold">AI / ML Systems</div>
+                </div>
+                <div>
+                  <div class="font-mono text-[9px] tracking-widest text-ink-soft mb-1">GRADUATING</div>
+                  <div class="text-xs font-bold">Class of 2026</div>
+                </div>
+                <div>
+                  <div class="font-mono text-[9px] tracking-widest text-ink-soft mb-1">UNIVERSITY</div>
+                  <div class="text-xs font-bold">AKTU, Lucknow</div>
+                </div>
+                <div>
+                  <div class="font-mono text-[9px] tracking-widest text-ink-soft mb-1">STATUS</div>
+                  <div class="text-xs font-bold" style="color:var(--sage)">On track ✓</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: Certifications -->
+      <div class="lg:col-span-5 reveal" style="transition-delay:0.15s">
+        <div class="flex items-center gap-3 mb-10">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(212,150,61,0.2);">
+            <svg class="w-5 h-5" style="color:var(--ochre)" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+          </div>
+          <div>
+            <div class="font-mono text-[10px] tracking-widest text-ink-soft">05.3</div>
+            <h3 class="font-serif text-3xl">Certifications</h3>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <!-- AWS AI/ML -->
+          <a href="https://drive.google.com/file/d/1gjvYDwCl8t5vdQwmdOPqvTBbHj8ue5vt/view" target="_blank" class="cert-card flex items-center gap-4 group">
+            <div class="ribbon">VERIFIED</div>
+            <div class="w-14 h-14 rounded-xl issuer-aws flex items-center justify-center shrink-0 text-white font-black text-xs shadow-lg">AWS</div>
+            <div class="flex-1 min-w-0 pr-8">
+              <h5 class="font-bold text-sm group-hover:text-terra transition">Fundamentals of AI &amp; Machine Learning</h5>
+              <p class="font-mono text-[10px] text-ink-soft tracking-wider mt-1">AWS TRAINING &amp; CERTIFICATION · 2024</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="tag text-[9px] bg-orange-50 border-orange-200">Cloud</span>
+                <span class="tag text-[9px] bg-orange-50 border-orange-200">ML Basics</span>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-ink-soft group-hover:text-terra transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+          </a>
+
+          <!-- AWS Cloud -->
+          <a href="https://drive.google.com/file/d/1cYmT81ZVuOD8qEpk4AeIdNCcrIVJv21a/view" target="_blank" class="cert-card flex items-center gap-4 group">
+            <div class="w-14 h-14 rounded-xl issuer-aws flex items-center justify-center shrink-0 text-white font-black text-xs shadow-lg">AWS</div>
+            <div class="flex-1 min-w-0">
+              <h5 class="font-bold text-sm group-hover:text-terra transition">Getting Started with Cloud Essentials</h5>
+              <p class="font-mono text-[10px] text-ink-soft tracking-wider mt-1">AWS TRAINING &amp; CERTIFICATION · 2024</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="tag text-[9px] bg-orange-50 border-orange-200">Cloud</span>
+                <span class="tag text-[9px] bg-orange-50 border-orange-200">Foundations</span>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-ink-soft group-hover:text-terra transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+          </a>
+
+          <!-- Oracle -->
+          <div class="cert-card flex items-center gap-4">
+            <div class="ribbon" style="background:var(--sage)">2025</div>
+            <div class="w-14 h-14 rounded-xl issuer-oracle flex items-center justify-center shrink-0 text-white font-black text-xs shadow-lg">OCI</div>
+            <div class="flex-1 min-w-0 pr-8">
+              <h5 class="font-bold text-sm">AI Foundations Associate</h5>
+              <p class="font-mono text-[10px] text-ink-soft tracking-wider mt-1">ORACLE CLOUD INFRASTRUCTURE · 2025</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="tag text-[9px] bg-red-50 border-red-200">AI</span>
+                <span class="tag text-[9px] bg-red-50 border-red-200">Associate</span>
+              </div>
+            </div>
+            <div class="w-5 h-5 rounded-full flex items-center justify-center" style="background:var(--sage)">
+              <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+            </div>
+          </div>
+
+          <!-- Google Cloud -->
+          <div class="cert-card flex items-center gap-4">
+            <div class="w-14 h-14 rounded-xl issuer-google flex items-center justify-center shrink-0 text-white font-black text-xs shadow-lg">GCP</div>
+            <div class="flex-1 min-w-0">
+              <h5 class="font-bold text-sm">Introduction to Generative AI</h5>
+              <p class="font-mono text-[10px] text-ink-soft tracking-wider mt-1">SIMLILEARN × GOOGLE CLOUD · 2024</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="tag text-[9px] bg-blue-50 border-blue-200">GenAI</span>
+                <span class="tag text-[9px] bg-blue-50 border-blue-200">LLMs</span>
+              </div>
+            </div>
+            <div class="w-5 h-5 rounded-full flex items-center justify-center" style="background:var(--sage)">
+              <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+            </div>
+          </div>
+
+          <!-- HackerRank -->
+          <a href="https://drive.google.com/file/d/1aXRwggwiG_DQ6gu4VzyxbXFN69DEHlqp/view" target="_blank" class="cert-card flex items-center gap-4 group">
+            <div class="w-14 h-14 rounded-xl issuer-hacker flex items-center justify-center shrink-0 text-white font-black text-xs shadow-lg">HR</div>
+            <div class="flex-1 min-w-0">
+              <h5 class="font-bold text-sm group-hover:text-terra transition">Python (Basic) Certificate</h5>
+              <p class="font-mono text-[10px] text-ink-soft tracking-wider mt-1">HACKERRANK · VERIFIED CREDENTIAL</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="tag text-[9px] bg-green-50 border-green-200">Python</span>
+                <span class="tag text-[9px] bg-green-50 border-green-200">Coding</span>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-ink-soft group-hover:text-terra transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+          </a>
+        </div>
+
+        <!-- Languages + Fun Fact -->
+        <div class="card p-6 mt-6 noise-overlay">
+          <div class="grid grid-cols-2 gap-5">
+            <div>
+              <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-3">LANGUAGES</div>
+              <ul class="text-sm space-y-2">
+                <li class="flex justify-between"><span class="font-semibold">English</span><span class="tag text-[9px] bg-terra/10 border-terra/30 text-terra">Fluent</span></li>
+                <li class="flex justify-between"><span class="font-semibold">Hindi</span><span class="tag text-[9px] bg-terra/10 border-terra/30 text-terra">Native</span></li>
+              </ul>
+            </div>
+            <div>
+              <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-3">DISCIPLINE</div>
+              <p class="text-sm text-ink-soft leading-relaxed">
+                <span class="italic-serif text-terra text-2xl block mb-1">3+ yrs</span>
+                Dedicated fitness athlete. I bring the same discipline to debugging as I do to deadlifts.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT DETAILS (NEW, VERY VISIBLE) ===== -->
+<section id="contact" class="relative py-28 px-6 lg:px-10 bg-cream-dark noise-overlay border-t border-ink/5 overflow-hidden">
+  <div class="morph-shape" style="top:10%; right:-5%; width:400px; height:400px; opacity:0.08;"></div>
+  <div class="blob" style="bottom:10%; left:-10%; width:400px; height:400px; background:var(--teal); animation-delay:-5s;"></div>
+
+  <div class="max-w-7xl mx-auto relative">
+    <div class="flex flex-wrap items-end justify-between gap-6 mb-12 reveal">
+      <div>
+        <div class="section-label text-ink-soft mb-6">06 — DIRECT CONTACT</div>
+        <h2 class="font-serif text-5xl md:text-7xl leading-[0.95] tracking-tighter max-w-3xl">
+          Reach me <span class="italic-serif text-terra">anywhere</span>.<br/>
+          I reply within 48 hrs.
+        </h2>
+      </div>
+      <div class="flex items-center gap-3 bg-cream px-5 py-3 rounded-full border border-ink/10">
+        <span class="pulse-dot"></span>
+        <span class="font-mono text-xs tracking-widest">AVAILABLE FOR ROLES · Q3 2026</span>
+      </div>
+    </div>
+
+    <!-- Big Contact Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+      <!-- Email -->
+      <a href="mailto:chaudharyhimanshu710@gmail.com" class="contact-card reveal">
+        <div class="flex items-start justify-between mb-6">
+          <div class="big-icon" style="background: rgba(232,85,46,0.12); color:var(--terra);">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <span class="font-mono text-[10px] tracking-widest text-ink-soft">PREFERRED</span>
+        </div>
+        <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-2">EMAIL</div>
+        <div class="font-serif text-2xl md:text-3xl leading-tight break-all" style="word-break:break-word;">
+          chaudharyhimanshu710<span class="text-terra">@</span>gmail.com
+        </div>
+        <div class="flex items-center justify-between mt-6 pt-5 border-t border-ink/10">
+          <span class="text-xs text-ink-soft font-medium">Click to compose email</span>
+          <button class="copy-btn" onclick="event.preventDefault(); copyText('chaudharyhimanshu710@gmail.com', this);">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3"/></svg>
+            COPY
+          </button>
+        </div>
+      </a>
+
+      <!-- Phone -->
+      <a href="tel:+919999842513" class="contact-card reveal" style="transition-delay:0.05s">
+        <div class="flex items-start justify-between mb-6">
+          <div class="big-icon" style="background: rgba(42,157,143,0.15); color:var(--teal);">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          </div>
+          <span class="font-mono text-[10px] tracking-widest text-ink-soft">INDIA · IST</span>
+        </div>
+        <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-2">PHONE</div>
+        <div class="font-serif text-2xl md:text-3xl leading-tight">
+          +91 <span class="text-terra">99998</span> 42513
+        </div>
+        <div class="flex items-center justify-between mt-6 pt-5 border-t border-ink/10">
+          <span class="text-xs text-ink-soft font-medium">Tap to call · Mon–Sat, 10am–8pm</span>
+          <button class="copy-btn" onclick="event.preventDefault(); copyText('+919999842513', this);">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3"/></svg>
+            COPY
+          </button>
+        </div>
+      </a>
+
+      <!-- LinkedIn -->
+      <a href="https://www.linkedin.com/in/himanshu-genai/" target="_blank" class="contact-card reveal" style="transition-delay:0.1s">
+        <div class="flex items-start justify-between mb-6">
+          <div class="big-icon" style="background: rgba(122,90,240,0.12); color:var(--violet);">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </div>
+          <span class="font-mono text-[10px] tracking-widest text-ink-soft">2K+ CONNECTIONS</span>
+        </div>
+        <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-2">LINKEDIN</div>
+        <div class="font-serif text-2xl md:text-3xl leading-tight">
+          linkedin.com/in/<span class="text-terra">himanshu-genai</span>
+        </div>
+        <div class="flex items-center justify-between mt-6 pt-5 border-t border-ink/10">
+          <span class="text-xs text-ink-soft font-medium">Professional network · GenAI content</span>
+          <span class="copy-btn" style="cursor:default;">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+            OPEN →
+          </span>
+        </div>
+      </a>
+
+      <!-- GitHub -->
+      <a href="https://github.com/Officialhimanshu710" target="_blank" class="contact-card reveal" style="transition-delay:0.15s">
+        <div class="flex items-start justify-between mb-6">
+          <div class="big-icon bg-ink text-cream">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </div>
+          <span class="font-mono text-[10px] tracking-widest text-ink-soft">OPEN SOURCE</span>
+        </div>
+        <div class="font-mono text-[10px] tracking-widest text-ink-soft mb-2">GITHUB</div>
+        <div class="font-serif text-2xl md:text-3xl leading-tight">
+          github.com/<span class="text-terra">Officialhimanshu710</span>
+        </div>
+        <div class="flex items-center justify-between mt-6 pt-5 border-t border-ink/10">
+          <span class="text-xs text-ink-soft font-medium">All repos, code &amp; contributions</span>
+          <span class="copy-btn" style="cursor:default;">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+            OPEN →
+          </span>
+        </div>
+      </a>
+    </div>
+
+    <!-- CTA Strip -->
+    <div class="card card-tilt bg-ink text-cream p-8 md:p-12 noise-overlay reveal" data-tilt style="border-color: rgba(240,234,216,0.08);">
+      <div class="card-tilt-inner">
+        <div class="absolute -top-20 -right-20 w-80 h-80 rounded-full pointer-events-none" style="background:var(--terra); opacity:0.15; filter:blur(80px);"></div>
+        <div class="absolute -bottom-20 -left-20 w-80 h-80 rounded-full pointer-events-none" style="background:var(--teal); opacity:0.1; filter:blur(80px);"></div>
+
+        <div class="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div>
+            <div class="section-label text-cream/60 mb-4">LET'S BUILD SOMETHING</div>
+            <h3 class="font-serif text-4xl md:text-5xl leading-[0.95]">
+              Have a <span class="italic-serif text-terra">GenAI idea</span>?<br/>
+              <span class="italic-serif">Let's ship it.</span>
+            </h3>
+            <p class="text-cream/70 mt-4 text-sm leading-relaxed max-w-md">
+              Hiring for a GenAI role? Building a product with intelligent automation? I reply to every thoughtful message within 48 hours.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-3 md:justify-end">
+            <a href="mailto:chaudharyhimanshu710@gmail.com" class="btn bg-cream text-ink magnetic hover:bg-terra hover:text-cream">
+              Send me an email
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+            </a>
+            <a href="https://drive.google.com/file/d/1_MybbD_sdefyRlESaFW27d6pEQNtSxgu/view" target="_blank" class="btn bg-transparent border border-cream/30 text-cream magnetic hover:bg-cream hover:text-ink">
+              Download Resume
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-16 pt-8 border-t border-ink/10 flex flex-wrap items-center justify-between gap-4 text-[10px] font-mono tracking-[0.3em] uppercase text-ink-soft">
+      <div>© 2026 HIMANSHU DULHE</div>
+      <div class="italic-serif text-sm normal-case tracking-normal text-ink-soft" style="font-family:'Instrument Serif',serif; letter-spacing:normal; text-transform:none;">Crafted with care · Greater Noida</div>
+      <div>v5.0 · JUL 13 2026</div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Custom Cursor
+  const cursorDot = document.getElementById('cursorDot');
+  const cursorRing = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursorDot.style.left = mouseX + 'px';
+    cursorDot.style.top = mouseY + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.15;
+    ringY += (mouseY - ringY) * 0.15;
+    cursorRing.style.left = ringX + 'px';
+    cursorRing.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .card, .tag, .cert-card, .contact-card, .arsenal-card, .tool-chip, .stack-orbit-item').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+
+  // Scroll progress
+  const scrollProgress = document.getElementById('scrollProgress');
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = scrollTop / docHeight;
+    scrollProgress.style.transform = `scaleX(${progress})`;
+  });
+
+  // Reveal
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        revealObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+  // Typing effect
+  const typingText = document.getElementById('typingText');
+  const phrases = [
+    'Generative AI Engineer building production-ready LLM systems.',
+    'Specialist in scalable RAG pipelines & fine-tuned open-source models.',
+    'Architecting autonomous agentic workflows with LangGraph & n8n.',
+    'Turning ambiguous problems into intelligent, real-world solutions.'
+  ];
+  let phraseIdx = 0, charIdx = 0, isDeleting = false;
+
+  function type() {
+    const current = phrases[phraseIdx];
+    if (!isDeleting) {
+      typingText.textContent = current.substring(0, charIdx + 1);
+      charIdx++;
+      if (charIdx === current.length) {
+        isDeleting = true;
+        setTimeout(type, 2500);
+        return;
+      }
+      setTimeout(type, 35 + Math.random() * 40);
+    } else {
+      typingText.textContent = current.substring(0, charIdx - 1);
+      charIdx--;
+      if (charIdx === 0) {
+        isDeleting = false;
+        phraseIdx = (phraseIdx + 1) % phrases.length;
+        setTimeout(type, 500);
+        return;
+      }
+      setTimeout(type, 18);
+    }
+  }
+  setTimeout(type, 800);
+
+  // Counters
+  const counters = document.querySelectorAll('[data-count]');
+  const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.count);
+        const suffix = el.innerHTML.replace(/[0-9]/g, '');
+        let current = 0;
+        const step = target / 50;
+        const increment = () => {
+          current += step;
+          if (current >= target) {
+            el.innerHTML = target + suffix;
+          } else {
+            el.innerHTML = Math.floor(current) + suffix;
+            requestAnimationFrame(increment);
+          }
+        };
+        increment();
+        counterObs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => counterObs.observe(c));
+
+  // Tilt cards
+  document.querySelectorAll('[data-tilt]').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2, cy = rect.height / 2;
+      const rotateX = ((y - cy) / cy) * -6;
+      const rotateY = ((x - cx) / cx) * 6;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+    });
+  });
+
+  // Arsenal card spotlight
+  document.querySelectorAll('[data-arsenal]').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--mx', x + '%');
+      card.style.setProperty('--my', y + '%');
+    });
+  });
+
+  // Magnetic buttons
+  document.querySelectorAll('.magnetic').forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'translate(0,0)';
+    });
+  });
+
+  // Nav active
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', () => {
+    const scrollPos = window.scrollY + 150;
+    sections.forEach(section => {
+      if (scrollPos >= section.offsetTop && scrollPos < section.offsetTop + section.offsetHeight) {
+        navLinks.forEach(link => {
+          const active = link.getAttribute('href') === '#' + section.id;
+          link.style.color = active ? 'var(--terra)' : '';
         });
+      }
+    });
+  });
 
-        // --- MAILTO FUNCTIONALITY ---
-        function sendMail() {
-            const name = document.getElementById('contactName').value;
-            const email = document.getElementById('contactEmail').value;
-            const message = document.getElementById('contactMessage').value;
-            
-            if(!name || !email || !message) {
-                alert('Please fill in all fields');
-                return;
-            }
+  // Mobile menu
+  const mobileMenu = document.getElementById('mobileMenu');
+  document.getElementById('mobileMenuBtn').addEventListener('click', () => mobileMenu.classList.remove('translate-x-full'));
+  document.getElementById('mobileMenuClose').addEventListener('click', () => mobileMenu.classList.add('translate-x-full'));
+  document.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', () => mobileMenu.classList.add('translate-x-full')));
 
-            const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
-            const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-            window.location.href = `mailto:chaudharyhimanshu710@gmail.com?subject=${subject}&body=${body}`;
-        }
-
-        // --- EXTRAORDINARY 3D SCENE ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true, antialias: true });
-        
-        // Geometric Core
-        const coreGeo = new THREE.IcosahedronGeometry(10, 3);
-        const coreMat = new THREE.MeshPhongMaterial({
-            color: 0xa855f7,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.2,
-            emissive: 0x8b5cf6,
-            emissiveIntensity: 0.5
+  // Smooth scroll for all hash links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        e.preventDefault();
+        window.scrollTo({
+          top: targetElement.offsetTop - 100,
+          behavior: 'smooth'
         });
-        const core = new THREE.Mesh(coreGeo, coreMat);
-        scene.add(core);
+      }
+    });
+  });
 
-        // Particle System
-        const particlesCount = 800;
-        const positions = new Float32Array(particlesCount * 3);
-        const colors = new Float32Array(particlesCount * 3);
-        const teal = new THREE.Color(0x00f5d4);
-        const violet = new THREE.Color(0xa855f7);
+  // Copy to clipboard
+  function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg> COPIED!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = original;
+      }, 2000);
+    });
+  }
 
-        for(let i=0; i<particlesCount*3; i+=3) {
-            positions[i] = (Math.random() - 0.5) * 60;
-            positions[i+1] = (Math.random() - 0.5) * 60;
-            positions[i+2] = (Math.random() - 0.5) * 60;
-            const mix = Math.random();
-            colors[i] = teal.r * mix + violet.r * (1-mix);
-            colors[i+1] = teal.g * mix + violet.g * (1-mix);
-            colors[i+2] = teal.b * mix + violet.b * (1-mix);
-        }
-
-        const particlesGeo = new THREE.BufferGeometry();
-        particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        particlesGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        const particlesMat = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.6 });
-        const particles = new THREE.Points(particlesGeo, particlesMat);
-        scene.add(particles);
-
-        // Grid Floor
-        const gridGeo = new THREE.PlaneGeometry(120, 120, 40, 40);
-        const gridMat = new THREE.MeshBasicMaterial({ color: 0x00f5d4, wireframe: true, transparent: true, opacity: 0.05 });
-        const grid = new THREE.Mesh(gridGeo, gridMat);
-        grid.rotation.x = -Math.PI / 2;
-        grid.position.y = -25;
-        scene.add(grid);
-
-        // Lighting
-        const pLight = new THREE.PointLight(0xffffff, 1.2);
-        pLight.position.set(20, 20, 20);
-        scene.add(pLight);
-        scene.add(new THREE.AmbientLight(0x404040));
-
-        camera.position.z = 45;
-
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            core.rotation.y += 0.002;
-            core.rotation.z += 0.001;
-            particles.rotation.y -= 0.0005;
-            camera.position.x += (mouseX * 5 - camera.position.x) * 0.02;
-            camera.position.y += (-mouseY * 5 - camera.position.y) * 0.02;
-            camera.lookAt(scene.position);
-            core.position.x += (mouseX * 3 - core.position.x) * 0.05;
-            core.position.y += (-mouseY * 3 - core.position.y) * 0.05;
-            grid.position.z += 0.06;
-            if(grid.position.z > 5) grid.position.z = 0;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-
-        const cards = document.querySelectorAll('.tilt-card');
-        cards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -12; 
-                const rotateY = ((x - centerX) / centerX) * 12;
-                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-12px)`;
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'rotateX(0deg) rotateY(0deg) translateY(0)';
-            });
-        });
-
-        const reveals = document.querySelectorAll('.reveal');
-        function checkReveal() {
-            reveals.forEach(el => {
-                const top = el.getBoundingClientRect().top;
-                if(top < window.innerHeight * 0.90) el.classList.add('active');
-            });
-        }
-        window.addEventListener('scroll', checkReveal);
-        checkReveal(); // Trigger once on load
-    </script>
+  // Parallax blobs
+  window.addEventListener('scroll', () => {
+    const scroll = window.scrollY;
+    document.querySelectorAll('.blob').forEach((blob, i) => {
+      blob.style.transform = `translateY(${scroll * (i % 2 === 0 ? 0.1 : -0.08)}px)`;
+    });
+  });
+</script>
 </body>
 </html>
